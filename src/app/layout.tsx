@@ -9,9 +9,9 @@ const geistSans = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Mermaid Diagram Editor",
+  title: "Flowchart Builder",
   description:
-    "Create, edit, and export Mermaid diagrams with a live preview editor.",
+    "Interactive flowchart builder with visual node management, Mermaid diagram rendering, and export options.",
 };
 
 export default function RootLayout({
