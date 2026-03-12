@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #000000;
+  --background: #0f172a;
+  --foreground: #f1f5f9;
 }
 
 body {
@@ -12,23 +12,12 @@ body {
   background: var(--background);
 }
 
-/* Ensure CodeMirror fills its container */
-.cm-editor {
-  height: 100% !important;
-}
-
-.cm-scroller {
-  overflow: auto !important;
-}
-
 @media print {
   header,
-  .toolbar,
-  .code-panel {
+  aside {
     display: none !important;
   }
-  .preview-panel {
+  main {
     width: 100% !important;
-    border: none !important;
   }
 }

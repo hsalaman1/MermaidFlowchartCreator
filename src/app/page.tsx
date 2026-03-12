@@ -1,21 +1,14 @@
 import dynamic from "next/dynamic";
 
-const MermaidEditor = dynamic(() => import("@/components/MermaidEditor"), {
+const FlowchartBuilder = dynamic(() => import("@/components/FlowchartBuilder"), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center flex-1">
-      <p className="text-gray-500">Loading editor...</p>
+    <div className="flex items-center justify-center h-screen bg-slate-900">
+      <p className="text-slate-400">Loading Flowchart Builder...</p>
     </div>
   ),
 });
 
 export default function Home() {
-  return (
-    <main className="h-screen flex flex-col">
-      <header className="border-b border-gray-200 px-6 py-4 bg-white">
-        <h1 className="text-xl font-bold text-black">Mermaid Diagram Editor</h1>
-      </header>
-      <MermaidEditor />
-    </main>
-  );
+  return <FlowchartBuilder />;
 }
