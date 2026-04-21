@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Plus, Trash2, Upload, Save, FolderOpen,
   ChevronRight, Users, Copy, FileText, Image as ImageIcon, RefreshCw, FileDown,
+  Menu, X,
 } from 'lucide-react';
 import mermaid from 'mermaid';
 
@@ -31,6 +32,7 @@ export default function FlowchartBuilder() {
   const [editMode, setEditMode] = useState(false);
 
   const [showWizard, setShowWizard] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [connectionMode, setConnectionMode] = useState<{ active: boolean; fromNode: string | null }>({
     active: false,
     fromNode: null,
@@ -48,7 +50,6 @@ export default function FlowchartBuilder() {
 
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // Initialize mermaid
   useEffect(() => {
     mermaid.initialize({
       startOnLoad: false,
@@ -58,12 +59,10 @@ export default function FlowchartBuilder() {
     setSavedCharts(loadCharts());
   }, []);
 
-  // Generate code when nodes/connections change
   useEffect(() => {
     setMermaidCode(generateMermaidCode(nodes, connections));
   }, [nodes, connections]);
 
-  // Debounce then render
   const debouncedCode = useDebouncedValue(mermaidCode, 300);
 
   const renderMermaid = useCallback(async () => {
@@ -87,7 +86,6 @@ export default function FlowchartBuilder() {
     renderMermaid();
   }, [renderMermaid]);
 
-  // Keep selectedNode in sync with nodes
   useEffect(() => {
     if (selectedNode) {
       const updated = nodes.find(n => n.id === selectedNode.id);
@@ -111,6 +109,7 @@ export default function FlowchartBuilder() {
       setConnections(prev => [...prev, { from: connection.from, to: newNode.id, label: connection.label }]);
     }
     setShowWizard(false);
+    setSidebarOpen(false);
   };
 
   const handleSelectNode = (node: FlowchartNode) => {
@@ -222,139 +221,194 @@ export default function FlowchartBuilder() {
     }
   };
 
+  const sidebarContent = (
+    <>
+      <div className="p-4 border-b border-slate-700 space-y-2">
+        {/* Chart name input — visible on mobile in sidebar */}
+        <div className="md:hidden mb-2">
+          <label className="block text-xs text-slate-400 mb-1">Chart Name</label>
+          <input
+            type="text"
+            value={currentChartName}
+            onChange={(e) => setCurrentChartName(e.target.value)}
+            className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+        </div>
+        <button
+          onClick={() => { setShowWizard(true); setEditMode(false); setSelectedNode(null); setSidebarOpen(false); }}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 rounded-lg font-medium transition"
+        >
+          <Plus size={20} /> Add Node
+        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowActorModal(true)}
+            className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition"
+          >
+            <Users size={16} /> Actors
+          </button>
+          <button
+            onClick={clearAll}
+            className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-red-900/50 hover:bg-red-800 rounded text-sm transition"
+          >
+            <Trash2 size={16} /> Clear All
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4">
+        <h3 className="text-sm font-semibold text-slate-400 mb-3">
+          Nodes ({nodes.length})
+        </h3>
+        <NodeList
+          nodes={nodes}
+          connections={connections}
+          selectedNodeId={selectedNode?.id ?? null}
+          connectionMode={connectionMode}
+          onSelectNode={handleSelectNode}
+          onConnectTo={handleConnectTo}
+        />
+      </div>
+
+      {editMode && selectedNode && (
+        <NodeEditor
+          node={selectedNode}
+          actors={actors}
+          connections={connections}
+          nodes={nodes}
+          onUpdate={handleUpdateNode}
+          onDelete={handleDeleteNode}
+          onStartConnection={handleStartConnection}
+          onDeleteConnection={handleDeleteConnection}
+        />
+      )}
+
+      {connectionMode.active && (
+        <div className="border-t border-green-500 p-3 bg-green-500/10">
+          <p className="text-sm text-green-400 text-center">
+            Click a node to connect to it, or{' '}
+            <button
+              onClick={() => setConnectionMode({ active: false, fromNode: null })}
+              className="underline"
+            >
+              cancel
+            </button>
+          </p>
+        </div>
+      )}
+    </>
+  );
+
   return (
     <div className="h-screen flex flex-col bg-slate-900 text-slate-100 font-sans">
       {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+      <header className="bg-slate-800 border-b border-slate-700 px-3 md:px-4 py-3 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 md:gap-4 min-w-0">
+          {/* Mobile menu toggle */}
+          <button
+            onClick={() => setSidebarOpen(prev => !prev)}
+            className="md:hidden p-1.5 bg-slate-700 hover:bg-slate-600 rounded transition"
+          >
+            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+          <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent whitespace-nowrap">
             Flowchart Builder
           </h1>
           <input
             type="text"
             value={currentChartName}
             onChange={(e) => setCurrentChartName(e.target.value)}
-            className="bg-slate-700 border border-slate-600 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="hidden md:block bg-slate-700 border border-slate-600 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
           <button
             onClick={() => setShowImportModal(true)}
-            className="flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition"
+            className="flex items-center gap-1 px-2 md:px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition"
+            title="Import"
           >
-            <Upload size={16} /> Import
+            <Upload size={16} /> <span className="hidden md:inline">Import</span>
           </button>
           <button
             onClick={handleExportMermaid}
             disabled={!mermaidCode}
-            className="flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition disabled:opacity-50"
+            className="hidden md:flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition disabled:opacity-50"
+            title="Export Mermaid"
           >
             <FileText size={16} /> Mermaid
           </button>
           <button
             onClick={handleExportPng}
             disabled={!mermaidSvg}
-            className="flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition disabled:opacity-50"
+            className="flex items-center gap-1 px-2 md:px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition disabled:opacity-50"
+            title="Export PNG"
           >
-            <ImageIcon size={16} /> PNG
+            <ImageIcon size={16} /> <span className="hidden md:inline">PNG</span>
           </button>
           <button
             onClick={handleExportPdf}
             disabled={!mermaidSvg}
-            className="flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition disabled:opacity-50"
+            className="flex items-center gap-1 px-2 md:px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition disabled:opacity-50"
+            title="Export PDF"
           >
-            <FileDown size={16} /> PDF
+            <FileDown size={16} /> <span className="hidden md:inline">PDF</span>
           </button>
           <button
             onClick={handleCopyCode}
             disabled={!mermaidCode}
-            className="flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition disabled:opacity-50"
+            className="hidden md:flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition disabled:opacity-50"
+            title="Copy Code"
           >
             <Copy size={16} /> Copy Code
           </button>
-          <div className="w-px h-6 bg-slate-600 mx-2" />
+          <div className="w-px h-6 bg-slate-600 mx-1 md:mx-2 hidden md:block" />
           <button
             onClick={() => setShowSaveModal(true)}
-            className="flex items-center gap-1 px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded text-sm transition"
+            className="flex items-center gap-1 px-2 md:px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded text-sm transition"
+            title="Save"
           >
-            <Save size={16} /> Save
+            <Save size={16} /> <span className="hidden md:inline">Save</span>
           </button>
           <button
             onClick={() => setShowLoadModal(true)}
-            className="flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition"
+            className="flex items-center gap-1 px-2 md:px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition"
+            title="Load"
           >
-            <FolderOpen size={16} /> Load
+            <FolderOpen size={16} /> <span className="hidden md:inline">Load</span>
           </button>
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Panel */}
-        <aside className="w-80 bg-slate-800 border-r border-slate-700 flex flex-col overflow-hidden">
-          <div className="p-4 border-b border-slate-700 space-y-2">
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Mobile sidebar backdrop */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-20 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Sidebar — overlay on mobile, static on desktop */}
+        <aside
+          className={`
+            fixed inset-y-0 left-0 z-30 w-80 bg-slate-800 border-r border-slate-700 flex flex-col overflow-hidden
+            transform transition-transform duration-200 ease-in-out
+            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+            md:static md:translate-x-0 md:transition-none
+          `}
+        >
+          {/* Mobile close button */}
+          <div className="md:hidden flex items-center justify-between px-4 pt-3 pb-1">
+            <span className="text-sm font-semibold text-slate-400">Menu</span>
             <button
-              onClick={() => { setShowWizard(true); setEditMode(false); setSelectedNode(null); }}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 rounded-lg font-medium transition"
+              onClick={() => setSidebarOpen(false)}
+              className="p-1 hover:bg-slate-700 rounded transition"
             >
-              <Plus size={20} /> Add Node
+              <X size={18} />
             </button>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowActorModal(true)}
-                className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition"
-              >
-                <Users size={16} /> Actors
-              </button>
-              <button
-                onClick={clearAll}
-                className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-red-900/50 hover:bg-red-800 rounded text-sm transition"
-              >
-                <Trash2 size={16} /> Clear All
-              </button>
-            </div>
           </div>
-
-          <div className="flex-1 overflow-y-auto p-4">
-            <h3 className="text-sm font-semibold text-slate-400 mb-3">
-              Nodes ({nodes.length})
-            </h3>
-            <NodeList
-              nodes={nodes}
-              connections={connections}
-              selectedNodeId={selectedNode?.id ?? null}
-              connectionMode={connectionMode}
-              onSelectNode={handleSelectNode}
-              onConnectTo={handleConnectTo}
-            />
-          </div>
-
-          {editMode && selectedNode && (
-            <NodeEditor
-              node={selectedNode}
-              actors={actors}
-              connections={connections}
-              nodes={nodes}
-              onUpdate={handleUpdateNode}
-              onDelete={handleDeleteNode}
-              onStartConnection={handleStartConnection}
-              onDeleteConnection={handleDeleteConnection}
-            />
-          )}
-
-          {connectionMode.active && (
-            <div className="border-t border-green-500 p-3 bg-green-500/10">
-              <p className="text-sm text-green-400 text-center">
-                Click a node to connect to it, or{' '}
-                <button
-                  onClick={() => setConnectionMode({ active: false, fromNode: null })}
-                  className="underline"
-                >
-                  cancel
-                </button>
-              </p>
-            </div>
-          )}
+          {sidebarContent}
         </aside>
 
         {/* Right Panel */}
@@ -368,7 +422,7 @@ export default function FlowchartBuilder() {
             />
           )}
 
-          <div className="flex-1 overflow-auto p-8">
+          <div className="flex-1 overflow-auto p-4 md:p-8">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-slate-300">Preview</h2>
               <button
@@ -381,7 +435,7 @@ export default function FlowchartBuilder() {
 
             <div
               ref={previewRef}
-              className="bg-white rounded-xl p-8 min-h-96 flex items-center justify-center"
+              className="bg-white rounded-xl p-4 md:p-8 min-h-64 md:min-h-96 flex items-center justify-center"
               dangerouslySetInnerHTML={{
                 __html: mermaidSvg || '<p style="color: #94a3b8;">Your flowchart will appear here</p>',
               }}
