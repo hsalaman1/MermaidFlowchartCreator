@@ -3,13 +3,152 @@
 @tailwind utilities;
 
 :root {
-  --background: #0f172a;
-  --foreground: #f1f5f9;
+  --background: #f7f2e9;
+  --foreground: #28231f;
+  --fc-paper: #fffdf9;
+  --fc-cream: #f7f2e9;
+  --fc-soft: #f2e9de;
+  --fc-line: #e5d8c9;
+  --fc-muted: #756b62;
+  --fc-orange: #c85f24;
+  --fc-orange-dark: #a94718;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
+}
+
+.flowchart-shell {
+  color: var(--foreground);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(220, 132, 76, 0.1), transparent 25rem),
+    var(--fc-cream);
+}
+
+.flowchart-header {
+  z-index: 40;
+  background: rgba(255, 253, 249, 0.96);
+  border-bottom: 1px solid var(--fc-line);
+  box-shadow: 0 8px 28px rgba(70, 49, 32, 0.07);
+  backdrop-filter: blur(16px);
+}
+
+.flowchart-title {
+  color: var(--foreground);
+  font-family: Georgia, "Times New Roman", serif;
+  letter-spacing: -0.03em;
+}
+
+.flowchart-sidebar {
+  color: var(--foreground);
+  background: rgba(255, 253, 249, 0.98);
+  border-color: var(--fc-line);
+  box-shadow: 12px 0 35px rgba(70, 49, 32, 0.08);
+}
+
+.flowchart-main {
+  background: transparent;
+}
+
+.flowchart-preview {
+  border: 1px solid var(--fc-line);
+  box-shadow: 0 20px 55px rgba(70, 49, 32, 0.09);
+}
+
+.flowchart-code {
+  background: rgba(255, 253, 249, 0.92);
+  border-color: var(--fc-line);
+}
+
+.flowchart-shell .bg-slate-900,
+.flowchart-shell .bg-slate-800 {
+  background-color: var(--fc-paper) !important;
+}
+
+.flowchart-shell .bg-slate-700 {
+  background-color: var(--fc-soft) !important;
+}
+
+.flowchart-shell .bg-slate-600 {
+  background-color: #e8dbce !important;
+}
+
+.flowchart-shell .border-slate-700,
+.flowchart-shell .border-slate-600 {
+  border-color: var(--fc-line) !important;
+}
+
+.flowchart-shell .text-slate-100,
+.flowchart-shell .text-slate-200,
+.flowchart-shell .text-slate-300 {
+  color: var(--foreground) !important;
+}
+
+.flowchart-shell .text-slate-400,
+.flowchart-shell .text-slate-500 {
+  color: var(--fc-muted) !important;
+}
+
+.flowchart-shell .bg-cyan-600 {
+  background-color: var(--fc-orange) !important;
+}
+
+.flowchart-shell .hover\:bg-cyan-500:hover {
+  background-color: var(--fc-orange-dark) !important;
+}
+
+.flowchart-shell .border-cyan-500 {
+  border-color: var(--fc-orange) !important;
+}
+
+.flowchart-shell .text-cyan-400 {
+  color: var(--fc-orange) !important;
+}
+
+.flowchart-shell input,
+.flowchart-shell textarea,
+.flowchart-shell select {
+  color: var(--foreground);
+  background: #fff !important;
+  border-color: var(--fc-line) !important;
+  border-radius: 10px;
+}
+
+.flowchart-shell input:focus,
+.flowchart-shell textarea:focus,
+.flowchart-shell select:focus {
+  border-color: var(--fc-orange) !important;
+  box-shadow: 0 0 0 3px rgba(200, 95, 36, 0.13) !important;
+}
+
+.flowchart-header button,
+.flowchart-sidebar button,
+.flowchart-main button {
+  box-shadow: 0 3px 10px rgba(70, 49, 32, 0.08);
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.flowchart-header button:hover,
+.flowchart-sidebar button:hover,
+.flowchart-main button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(70, 49, 32, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flowchart-shell *,
+  .flowchart-shell *::before,
+  .flowchart-shell *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .flowchart-shell button:hover {
+    transform: none;
+  }
 }
 
 @media print {

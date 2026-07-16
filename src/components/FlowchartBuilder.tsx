@@ -300,9 +300,9 @@ export default function FlowchartBuilder() {
   );
 
   return (
-    <div className="h-screen flex flex-col bg-slate-900 text-slate-100 font-sans">
+    <div className="flowchart-shell h-screen flex flex-col font-sans">
       {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700 px-3 md:px-4 py-3 flex items-center justify-between gap-2">
+      <header className="flowchart-header px-3 md:px-5 py-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 md:gap-4 min-w-0">
           {/* Mobile menu toggle */}
           <button
@@ -311,9 +311,10 @@ export default function FlowchartBuilder() {
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
-          <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent whitespace-nowrap">
-            Flowchart Builder
-          </h1>
+          <div className="min-w-0">
+            <span className="hidden md:block text-[10px] font-bold uppercase tracking-[0.17em] text-orange-700">Visual planning workspace</span>
+            <h1 className="flowchart-title text-lg md:text-2xl font-bold whitespace-nowrap">Flowchart Builder</h1>
+          </div>
           <input
             type="text"
             value={currentChartName}
@@ -392,7 +393,7 @@ export default function FlowchartBuilder() {
         {/* Sidebar — overlay on mobile, static on desktop */}
         <aside
           className={`
-            fixed inset-y-0 left-0 z-30 w-80 bg-slate-800 border-r border-slate-700 flex flex-col overflow-hidden
+            flowchart-sidebar fixed inset-y-0 left-0 z-30 w-80 border-r flex flex-col overflow-hidden
             transform transition-transform duration-200 ease-in-out
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
             md:static md:translate-x-0 md:transition-none
@@ -412,7 +413,7 @@ export default function FlowchartBuilder() {
         </aside>
 
         {/* Right Panel */}
-        <main className="flex-1 flex flex-col bg-slate-900 overflow-hidden relative">
+        <main className="flowchart-main flex-1 flex flex-col overflow-hidden relative">
           {showWizard && (
             <NodeWizard
               nodes={nodes}
@@ -435,14 +436,14 @@ export default function FlowchartBuilder() {
 
             <div
               ref={previewRef}
-              className="bg-white rounded-xl p-4 md:p-8 min-h-64 md:min-h-96 flex items-center justify-center"
+              className="flowchart-preview bg-white rounded-2xl p-4 md:p-8 min-h-64 md:min-h-96 flex items-center justify-center"
               dangerouslySetInnerHTML={{
                 __html: mermaidSvg || '<p style="color: #94a3b8;">Your flowchart will appear here</p>',
               }}
             />
           </div>
 
-          <div className="border-t border-slate-700 bg-slate-800">
+          <div className="flowchart-code border-t">
             <details className="group">
               <summary className="px-4 py-2 cursor-pointer text-sm text-slate-400 hover:text-slate-300 flex items-center gap-2">
                 <ChevronRight size={16} className="group-open:rotate-90 transition-transform" />
