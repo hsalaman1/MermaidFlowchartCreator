@@ -223,9 +223,9 @@ export default function FlowchartBuilder() {
 
   const sidebarContent = (
     <>
-      <div className="p-4 border-b border-slate-700 space-y-2">
+      <div className="builder-controls p-4 md:p-6 border-b border-slate-700 space-y-2">
         {/* Chart name input — visible on mobile in sidebar */}
-        <div className="md:hidden mb-2">
+        <div className="min-[901px]:hidden mb-2">
           <label className="block text-xs text-slate-400 mb-1">Chart Name</label>
           <input
             type="text"
@@ -236,29 +236,32 @@ export default function FlowchartBuilder() {
         </div>
         <button
           onClick={() => { setShowWizard(true); setEditMode(false); setSelectedNode(null); setSidebarOpen(false); }}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 rounded-lg font-medium transition"
+          className="flowchart-add-node w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition"
         >
-          <Plus size={20} /> Add Node
+          <Plus size={20} /> Add Flowchart Node
         </button>
         <div className="flex gap-2">
           <button
             onClick={() => setShowActorModal(true)}
-            className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition"
+            className="flowchart-segment flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-sm transition"
           >
             <Users size={16} /> Actors
           </button>
           <button
             onClick={clearAll}
-            className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-red-900/50 hover:bg-red-800 rounded text-sm transition"
+            className="flowchart-segment flowchart-danger flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-sm transition"
           >
             <Trash2 size={16} /> Clear All
           </button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4">
-        <h3 className="text-sm font-semibold text-slate-400 mb-3">
-          Nodes ({nodes.length})
+      <div className="flowchart-node-area p-4 md:p-6">
+        <h3 className="flowchart-node-count text-xs font-semibold uppercase tracking-wider mb-4">
+          <span>Flow Structure</span>
+          <span className="flowchart-count-pill">
+            {nodes.length} {nodes.length === 1 ? 'node' : 'nodes'}
+          </span>
         </h3>
         <NodeList
           nodes={nodes}
@@ -300,26 +303,28 @@ export default function FlowchartBuilder() {
   );
 
   return (
-    <div className="flowchart-shell h-screen flex flex-col font-sans">
+    <div className="flowchart-shell h-screen flex flex-col">
       {/* Header */}
-      <header className="flowchart-header px-3 md:px-5 py-3 flex items-center justify-between gap-2">
+      <header className="flowchart-header h-14 px-3 md:px-6 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 md:gap-4 min-w-0">
           {/* Mobile menu toggle */}
           <button
             onClick={() => setSidebarOpen(prev => !prev)}
-            className="md:hidden p-1.5 bg-slate-700 hover:bg-slate-600 rounded transition"
+            className="min-[901px]:hidden p-1.5 bg-slate-700 hover:bg-slate-600 rounded transition"
+            aria-label={sidebarOpen ? 'Close flowchart tools' : 'Open flowchart tools'}
+            aria-expanded={sidebarOpen}
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
-          <div className="min-w-0">
-            <span className="hidden md:block text-[10px] font-bold uppercase tracking-[0.17em] text-orange-700">Visual planning workspace</span>
-            <h1 className="flowchart-title text-lg md:text-2xl font-bold whitespace-nowrap">Flowchart Builder</h1>
+          <div className="flowchart-brand-lockup">
+            <h1 className="flowchart-title text-lg md:text-2xl font-semibold whitespace-nowrap">Flowchart Builder</h1>
+            <span className="flowchart-brand-sub">Visual protocol workspace</span>
           </div>
           <input
             type="text"
             value={currentChartName}
             onChange={(e) => setCurrentChartName(e.target.value)}
-            className="hidden md:block bg-slate-700 border border-slate-600 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            className="hidden min-[901px]:block bg-slate-700 border border-slate-600 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
         </div>
 
@@ -329,12 +334,12 @@ export default function FlowchartBuilder() {
             className="flex items-center gap-1 px-2 md:px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition"
             title="Import"
           >
-            <Upload size={16} /> <span className="hidden md:inline">Import</span>
+            <Upload size={16} /> <span className="flowchart-toolbar-label hidden md:inline">Import</span>
           </button>
           <button
             onClick={handleExportMermaid}
             disabled={!mermaidCode}
-            className="hidden md:flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition disabled:opacity-50"
+            className="flowchart-toolbar-hide hidden md:flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition disabled:opacity-50"
             title="Export Mermaid"
           >
             <FileText size={16} /> Mermaid
@@ -345,7 +350,7 @@ export default function FlowchartBuilder() {
             className="flex items-center gap-1 px-2 md:px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition disabled:opacity-50"
             title="Export PNG"
           >
-            <ImageIcon size={16} /> <span className="hidden md:inline">PNG</span>
+            <ImageIcon size={16} /> <span className="flowchart-toolbar-label hidden md:inline">PNG</span>
           </button>
           <button
             onClick={handleExportPdf}
@@ -353,12 +358,12 @@ export default function FlowchartBuilder() {
             className="flex items-center gap-1 px-2 md:px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition disabled:opacity-50"
             title="Export PDF"
           >
-            <FileDown size={16} /> <span className="hidden md:inline">PDF</span>
+            <FileDown size={16} /> <span className="flowchart-toolbar-label hidden md:inline">PDF</span>
           </button>
           <button
             onClick={handleCopyCode}
             disabled={!mermaidCode}
-            className="hidden md:flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition disabled:opacity-50"
+            className="flowchart-toolbar-hide hidden md:flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition disabled:opacity-50"
             title="Copy Code"
           >
             <Copy size={16} /> Copy Code
@@ -366,26 +371,37 @@ export default function FlowchartBuilder() {
           <div className="w-px h-6 bg-slate-600 mx-1 md:mx-2 hidden md:block" />
           <button
             onClick={() => setShowSaveModal(true)}
-            className="flex items-center gap-1 px-2 md:px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded text-sm transition"
+            className="flowchart-save flex items-center gap-1 px-2 md:px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 rounded text-sm transition"
             title="Save"
           >
-            <Save size={16} /> <span className="hidden md:inline">Save</span>
+            <Save size={16} /> <span className="flowchart-toolbar-label hidden md:inline">Save</span>
           </button>
           <button
             onClick={() => setShowLoadModal(true)}
             className="flex items-center gap-1 px-2 md:px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-sm transition"
             title="Load"
           >
-            <FolderOpen size={16} /> <span className="hidden md:inline">Load</span>
+            <FolderOpen size={16} /> <span className="flowchart-toolbar-label hidden md:inline">Load</span>
           </button>
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden relative">
+      <section className="flowchart-workspace-bar" aria-label="Current flowchart summary">
+        <div>
+          <span className="flowchart-workspace-eyebrow">Current flowchart</span>
+          <strong>{currentChartName || 'Untitled Flowchart'}</strong>
+        </div>
+        <div className="flowchart-workspace-meta" aria-label="Flowchart totals">
+          <span>{nodes.length} {nodes.length === 1 ? 'node' : 'nodes'}</span>
+          <span>{connections.length} {connections.length === 1 ? 'connection' : 'connections'}</span>
+        </div>
+      </section>
+
+      <div className="flowchart-layout flex flex-1 overflow-hidden relative">
         {/* Mobile sidebar backdrop */}
         {sidebarOpen && (
           <div
-            className="fixed inset-0 bg-black/50 z-20 md:hidden"
+            className="fixed inset-0 bg-black/50 z-20 min-[901px]:hidden"
             onClick={() => setSidebarOpen(false)}
           />
         )}
@@ -393,18 +409,19 @@ export default function FlowchartBuilder() {
         {/* Sidebar — overlay on mobile, static on desktop */}
         <aside
           className={`
-            flowchart-sidebar fixed inset-y-0 left-0 z-30 w-80 border-r flex flex-col overflow-hidden
+            flowchart-sidebar fixed inset-y-0 left-0 z-30 w-80 min-[901px]:w-[380px] border flex flex-col overflow-y-auto
             transform transition-transform duration-200 ease-in-out
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-            md:static md:translate-x-0 md:transition-none
+            min-[901px]:static min-[901px]:translate-x-0 min-[901px]:transition-none
           `}
         >
           {/* Mobile close button */}
-          <div className="md:hidden flex items-center justify-between px-4 pt-3 pb-1">
+          <div className="min-[901px]:hidden flex items-center justify-between px-4 pt-3 pb-1">
             <span className="text-sm font-semibold text-slate-400">Menu</span>
             <button
               onClick={() => setSidebarOpen(false)}
               className="p-1 hover:bg-slate-700 rounded transition"
+              aria-label="Close flowchart tools"
             >
               <X size={18} />
             </button>
@@ -413,7 +430,7 @@ export default function FlowchartBuilder() {
         </aside>
 
         {/* Right Panel */}
-        <main className="flowchart-main flex-1 flex flex-col overflow-hidden relative">
+        <main className="flowchart-main flex-1 overflow-y-auto relative">
           {showWizard && (
             <NodeWizard
               nodes={nodes}
@@ -423,33 +440,36 @@ export default function FlowchartBuilder() {
             />
           )}
 
-          <div className="flex-1 overflow-auto p-4 md:p-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-slate-300">Preview</h2>
+          <div className="flowchart-preview-card p-4 md:p-6">
+            <div className="flowchart-preview-head flex items-center justify-between mb-5">
+              <div>
+                <span className="flowchart-preview-kicker">Live canvas</span>
+                <h2 className="text-3xl font-semibold">Flowchart Preview</h2>
+              </div>
               <button
                 onClick={renderMermaid}
-                className="flex items-center gap-1 px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded text-sm transition"
+                className="flowchart-refresh flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition"
               >
-                <RefreshCw size={14} /> Refresh
+                <RefreshCw size={14} /> Update Preview
               </button>
             </div>
 
             <div
               ref={previewRef}
-              className="flowchart-preview bg-white rounded-2xl p-4 md:p-8 min-h-64 md:min-h-96 flex items-center justify-center"
+              className="flowchart-preview rounded-xl p-4 md:p-10 min-h-64 flex items-center justify-center"
               dangerouslySetInnerHTML={{
                 __html: mermaidSvg || '<p style="color: #94a3b8;">Your flowchart will appear here</p>',
               }}
             />
           </div>
 
-          <div className="flowchart-code border-t">
+          <div className="flowchart-code mt-6 border">
             <details className="group">
-              <summary className="px-4 py-2 cursor-pointer text-sm text-slate-400 hover:text-slate-300 flex items-center gap-2">
+              <summary className="px-6 py-4 cursor-pointer text-sm text-slate-400 hover:text-slate-300 flex items-center gap-2">
                 <ChevronRight size={16} className="group-open:rotate-90 transition-transform" />
                 View Mermaid Code
               </summary>
-              <pre className="px-4 pb-4 text-xs text-slate-300 overflow-x-auto max-h-40 overflow-y-auto bg-slate-900/50 mx-4 mb-4 p-3 rounded-lg">
+              <pre className="flowchart-code-body text-xs overflow-x-auto max-h-40 overflow-y-auto mx-6 mb-6 p-5 rounded-xl">
                 {mermaidCode || 'No code generated yet'}
               </pre>
             </details>
