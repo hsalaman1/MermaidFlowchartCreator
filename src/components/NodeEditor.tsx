@@ -28,8 +28,8 @@ export default function NodeEditor({
   const outgoing = connections.filter(c => c.from === node.id);
 
   return (
-    <div className="border-t border-slate-700 p-4 bg-slate-800/80">
-      <h3 className="text-sm font-semibold text-slate-300 mb-3">Edit Node</h3>
+    <div className="flowchart-editor border-t border-slate-700 p-4 md:p-5">
+      <h3 className="flowchart-editor-title text-2xl font-semibold text-slate-300 mb-5">Edit Node</h3>
 
       <div className="space-y-3">
         <div>
@@ -84,23 +84,23 @@ export default function NodeEditor({
           </div>
         </div>
 
-        <div className="flex gap-2 pt-2">
+        <div className="flowchart-editor-actions flex gap-2 pt-2">
           <button
             onClick={onStartConnection}
-            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-green-600 hover:bg-green-500 rounded text-sm transition"
+            className="flowchart-connect flex-1 flex items-center justify-center gap-1 px-2 py-2.5 rounded text-sm transition"
           >
             <Link size={14} /> Connect
           </button>
           <button
             onClick={onDelete}
-            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-red-600 hover:bg-red-500 rounded text-sm transition"
+            className="flowchart-delete flex-1 flex items-center justify-center gap-1 px-2 py-2.5 rounded text-sm transition"
           >
             <Trash2 size={14} /> Delete
           </button>
         </div>
       </div>
 
-      <div className="mt-4">
+      <div className="flowchart-connections mt-5 pt-4">
         <h4 className="text-xs font-semibold text-slate-400 mb-2">Connections</h4>
         {outgoing.length === 0 ? (
           <p className="text-xs text-slate-500">No outgoing connections</p>
